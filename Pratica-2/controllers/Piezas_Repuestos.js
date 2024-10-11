@@ -160,19 +160,24 @@ export const allUsuario = async (req, res) => {
 };
 
 // Obtener un usuario por ID
-export const oneUsuario = async  (req, res) => {
-    const { id } = req.params;
-    const query = 'SELECT * FROM Usuarios WHERE id_usuario = ?';
-    db.query(query, [id], (err, results) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
+// En tu archivo de rutas o controlador
+export const oneUsuario = async (req, res) => {
+    const { id } = req.params; // Obtén el ID del usuario de los parámetros
+
+    try {
+        const [users] = await db.query("SELECT * FROM usuarios WHERE id_usuario = ?", [id]);
+
+        if (users.length === 0) {
+            return res.status(404).json({ message: "Usuario no encontrado" });
         }
-        if (results.length === 0) {
-            return res.status(404).json({ message: 'Usuario no encontrado' });
-        }
-        res.status(200).json(results[0]);
-    });
+
+        res.json(users[0]); // Devuelve los datos del usuario encontrado
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error interno del servidor" });
+    }
 };
+
 
 // Crear un nuevo usuario
 export const POSTUsuario = async  (req, res) => {
